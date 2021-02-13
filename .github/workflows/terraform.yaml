@@ -11,10 +11,6 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     name: Terraform Plan
-    defaults:
-      run:
-        working-directory: ${{ env.tf_actions_working_dir }}
-
     steps:
 
       - name: Echo github obj
@@ -59,7 +55,9 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
             <details><summary>Show Plan</summary>
