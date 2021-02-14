@@ -65,12 +65,13 @@ jobs:
         run: terraform validate -no-color
       
       - name: Terraform Plan
+        continue-on-error: true
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform plan')
         id: plan
-        run: terraform plan -no-color
-        continue-on-error: true
+        run: terraform plan -no-color -out plan.out
 
       - name: 'Upload Artifact'
+        continue-on-error: true
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform plan')
         uses: actions/upload-artifact@v2
         with:
@@ -114,8 +115,5 @@ jobs:
       - name: apply
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform apply')
         run: |
-          cd test
-          terraform init
-          echo 'brrrrrahhhht!'
           mv terraform-plan-artifact plan.out
           terraform apply "plan.out"
