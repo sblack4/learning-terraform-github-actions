@@ -106,11 +106,26 @@ jobs:
               body: output
             })
 
+      # why this action?
+      # see https://github.com/actions/toolkit/issues/501
       - name: Download a single artifact
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform apply')
-        uses: actions/download-artifact@v2
+        uses: dawidd6/action-download-artifact@v2
         with:
           name: terraform-plan-artifact
+          # Optional, GitHub token
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          # Required, workflow file name or ID
+          workflow: terraform.yml
+          # Optional, the status or conclusion of a completed workflow to search for
+          # Can be one of a workflow conculsion::
+          # "failure", "success", "neutral", "cancelled", "skipped", "timed_out", "action_required"
+          # Or a workflow status:
+          # "completed", "in_progress", "queued"
+          # Default: "completed"
+          workflow_conclusion: success
+          # Optional, will get head commit SHA
+          pr: ${{github.event.pull_request.number}}
       
       - name: Terraform Apply
         id: apply
