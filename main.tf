@@ -2,7 +2,7 @@
 
 resource "null_resource" "hello_world" {
   provisioner "local-exec" {
-    command = "echo 'hello bunny world'"
+    command = "echo 'hello hoppity bunny world'"
   }
 }
 
