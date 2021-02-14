@@ -130,7 +130,7 @@ jobs:
       - name: Terraform Apply
         id: apply
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform apply')
-        run: terraform init
+        run: terraform apply
 
       - uses: actions/github-script@0.9.0
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform apply')
