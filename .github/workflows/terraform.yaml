@@ -74,8 +74,8 @@ jobs:
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform plan')
         uses: actions/upload-artifact@v2
         with:
-          name: my-artifact
-          path: test/plan.out
+          name: terraform-plan-artifact
+          path: plan.out
           retention-days: 5
 
       - uses: actions/github-script@0.9.0
@@ -109,7 +109,7 @@ jobs:
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform apply')
         uses: actions/download-artifact@v2
         with:
-          name: my-artifact
+          name: terraform-plan-artifact
       
       - name: apply
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform apply')
@@ -117,5 +117,5 @@ jobs:
           cd test
           terraform init
           echo 'brrrrrahhhht!'
-          mv my-artifact plan.out
+          mv terraform-plan-artifact plan.out
           terraform apply "plan.out"
