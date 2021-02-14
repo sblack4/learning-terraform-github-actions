@@ -8,6 +8,34 @@ on:
 
 jobs:
 
+  dump_context:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJSON(job) }}
+        run: echo "$JOB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Dump runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJSON(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+      - name: Dump strategy context
+        env:
+          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
+        run: echo "$STRATEGY_CONTEXT"
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
+        run: echo "$MATRIX_CONTEXT"
+
   plan:
     runs-on: ubuntu-latest
     name: Terraform Plan or Apply
@@ -37,11 +65,13 @@ jobs:
         run: terraform validate -no-color
       
       - name: Terraform Plan
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform plan')
         id: plan
         run: terraform plan -no-color
         continue-on-error: true
 
       - name: 'Upload Artifact'
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform plan')
         uses: actions/upload-artifact@v2
         with:
           name: my-artifact
@@ -49,7 +79,7 @@ jobs:
           retention-days: 5
 
       - uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform plan')
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
@@ -76,13 +106,13 @@ jobs:
             })
 
       - name: Download a single artifact
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform apply')
         uses: actions/download-artifact@v2
         with:
           name: my-artifact
       
       - name: apply
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, 'terraform apply')
         run: |
           cd test
           terraform init
